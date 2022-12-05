@@ -26,5 +26,5 @@ echo "\n";
 //SORT TOTALS
 arsort($totals);
 
-//
+//PART 2 ANSWER
 echo array_sum(array_slice($totals,0,3,true)) . ' is the combined total of the top 3 elves';
