@@ -13,8 +13,8 @@ foreach($input as $line){
 		switch($line[1]){
 			case '..':
 				
-					$totals[array_key_last($stack)]	= array_pop($stack);
-					$stack[array_key_last($stack)] += end($totals);					
+				$totals[array_key_last($stack)]	= array_pop($stack);
+				$stack[array_key_last($stack)] += end($totals);					
 				
 			break;
 			default:
