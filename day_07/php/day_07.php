@@ -1,34 +1,61 @@
 <?php
 
-$input = file_get_contents('test.txt');
-$commandsWithReturn = explode('$',$input);
+$input = file('input.txt');
+//$input = file('test.txt');
 
-$fileSystem = array();
-$cwd = '';
+$stack = array();
+$totals = array();
 
-foreach($commandsWithReturn as $x){
-	$return = explode("\r\n",$x);
-	$command = explode(' ',trim(array_shift($return)));
-	
-	switch($command[0]){
-		case 'cd':
-			if($command[1] == '..'){
-				//UP ONE
-				$cwd = '';
-			}else{
-				$cwd = $cwd . '/' . $command[1];
-				if(!array_key_exists($cwd,$fileSystem)){
-					$fileSystem[$cwd] = array();
-				}
-			}
-			
-			
-		break;
-		case 'ls':
+foreach($input as $line){
+	$line = explode(' ', str_replace(array('$ ',"\r\n"), '', $line));
 
-		break;
+	if($line[0] == 'cd'){
+		switch($line[1]){
+			case '..':
+				
+					$totals[array_key_last($stack)]	= array_pop($stack);
+					$stack[array_key_last($stack)] += end($totals);					
+				
+			break;
+			default:
+				//MUST USE SOME SORT OF UNIQUE ID HERE - PREVIOUSLY USED FOLDER NAMES AND DUPLICATES BROKE PROCESS
+				$stack[uniqid()] = 0;
+			break;
+		}
 	}
-	
-	echo "$command[0]\r\n";
+
+	if(is_numeric($line[0])){ 
+		$stack[array_key_last($stack)] += $line[0];
+	}
 }
 
+while(count($stack)> 1){
+	$totals[array_key_last($stack)]	= array_pop($stack);
+	$stack[array_key_last($stack)] += end($totals);	
+}
+
+
+
+$totals[array_key_last($stack)]	= array_pop($stack);
+
+$filtered = array_filter($totals,function($a){return $a <= 100000;});
+
+echo "part 1 " . array_sum($filtered) . "\r\n";
+
+$fsTotal = 70000000;
+$updateRequires = 30000000;
+
+$inUse = end($totals);
+
+$spaceFree = $fsTotal - $inUse;
+$toDelete = $updateRequires -  $spaceFree;
+
+$potentials = $totals;
+
+foreach($potentials as $key=>$value){
+	if($value < $toDelete){
+		unset($potentials[$key]);
+	}
+}
+
+echo 'part 2 ' . min($potentials);
